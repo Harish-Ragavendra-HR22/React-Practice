@@ -6,19 +6,30 @@ function CourseList() {
 
   const [dummy, setDummy] = useState(true);
 
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     // console.log('useEffect called');
     // console.log(dummy);
 
     // fetch('https://jsonplaceholder.typicode.com/posts')
-    fetch("http://localhost:3000/courses")
-      .then((response) => {
-        console.log(response);
-        return response.json();
-      })
-      .then((data) => {
-        setCourses(data);
-      });
+    setTimeout(() => {
+      fetch("http://localhost:3000/courses")
+        .then((response) => {
+          if (!response.ok) {
+            throw Error("Couldn't retrive data");
+          }
+          console.log(response);
+          return response.json();
+        })
+        .then((data) => {
+          setCourses(data);
+        })
+        .catch((error) => {
+          console.log(error.message);
+          setError(error.message);
+        });
+    }, 1000);
   }, [dummy]);
 
   function handleDelete(id) {
@@ -29,12 +40,17 @@ function CourseList() {
 
   // courses.sort((x, y) => y.price - x.price);
 
-//   courses.sort((x, y) => y.rating - x.rating);
+  //   courses.sort((x, y) => y.rating - x.rating);
 
   // const vfmCourses = courses.filter((course)=>course.price < 500);
 
-  if(!courses){
-    return <></>
+  if (!courses) {
+    return (
+      <>
+        {!error && <p>Loading...</p>}
+        {error && <p>{error}</p>}
+      </>
+    );
   }
 
   const coursesList = courses.map(
